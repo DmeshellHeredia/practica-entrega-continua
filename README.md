@@ -32,8 +32,11 @@ practica-entrega-continua/
 ├── .dockerignore
 ├── .gitignore
 ├── README.md
-└── templates/
-    └── index.html
+├── templates/
+│   └── index.html
+└── .github/
+    └── workflows/
+        └── ci-cd.yml
 ```
 
 ## Ejecución local
@@ -93,3 +96,47 @@ Docker Hub:
 ```text
 https://hub.docker.com/r/dmeshell99/practica-entrega-continua
 ```
+
+## Entrega continua con GitHub Actions
+
+Cada `push` a la rama `main` ejecuta automáticamente el siguiente flujo:
+
+```text
+GitHub
+   ↓
+GitHub Actions
+   ↓
+Construcción de imagen Docker
+   ↓
+Docker Hub
+   ↓
+API de Render
+   ↓
+Aplicación en producción
+```
+
+### Detalles del workflow
+
+- **Nombre del workflow:** `CI/CD Docker Hub y Render`
+- **Ruta del archivo:** `.github/workflows/ci-cd.yml`
+- **Eventos que lo activan:** `push` a la rama `main` y ejecución manual mediante `workflow_dispatch`.
+- **Imagen publicada:** `dmeshell99/practica-entrega-continua`, con las etiquetas `latest` y `sha-<commit>`.
+- **Despliegue:** tras publicar la imagen en Docker Hub, el workflow solicita a la API de Render que despliegue el servicio a partir de esa misma imagen (`docker.io/dmeshell99/practica-entrega-continua:latest`).
+- **Verificación:** el workflow consulta la ruta `/health` del servicio en producción con reintentos limitados hasta confirmar que responde correctamente.
+- **URL pública de producción:** se documentará aquí una vez confirmada tras el primer despliegue.
+
+### Ejecución manual del workflow
+
+En GitHub, ir a la pestaña `Actions`, seleccionar el workflow `CI/CD Docker Hub y Render` y usar la opción `Run workflow`.
+
+### Secretos requeridos
+
+Estos valores se configuran en `Settings → Secrets and variables → Actions` del repositorio. Solo se almacenan sus nombres aquí, nunca sus valores:
+
+| Secreto | Uso |
+|---|---|
+| `DOCKERHUB_USERNAME` | Usuario de Docker Hub utilizado para iniciar sesión desde el workflow. |
+| `DOCKERHUB_TOKEN` | Personal Access Token de Docker Hub, usado en lugar de la contraseña para publicar la imagen. |
+| `RENDER_API_KEY` | API key de Render utilizada para autenticar la solicitud de despliegue. |
+| `RENDER_SERVICE_ID` | Identificador del servicio de Render (`srv-...`) sobre el que se solicita el despliegue. |
+| `RENDER_SERVICE_URL` | URL pública del servicio en Render, usada para verificar la ruta `/health` tras el despliegue. |
