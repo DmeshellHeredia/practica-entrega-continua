@@ -123,7 +123,7 @@ Aplicación en producción
 - **Imagen publicada:** `dmeshell99/practica-entrega-continua`, con las etiquetas `latest` y `sha-<commit>`.
 - **Despliegue:** tras publicar la imagen en Docker Hub, el workflow solicita a la API de Render que despliegue el servicio a partir de esa misma imagen (`docker.io/dmeshell99/practica-entrega-continua:latest`).
 - **Verificación:** el workflow consulta la ruta `/health` del servicio en producción con reintentos limitados hasta confirmar que responde correctamente.
-- **URL pública de producción:** se documentará aquí una vez confirmada tras el primer despliegue.
+- **URL pública de producción:** [https://practica-entrega-continua-9qcv.onrender.com](https://practica-entrega-continua-9qcv.onrender.com)
 
 ### Ejecución manual del workflow
 
